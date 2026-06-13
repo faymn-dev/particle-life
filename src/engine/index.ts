@@ -2,6 +2,7 @@ import type { Component } from "./component";
 
 export interface EngineArgs {
   container: HTMLElement
+  upscaleResolution?: number;
 }
 
 export class Engine {
@@ -11,10 +12,12 @@ export class Engine {
 
   width: number = innerWidth;
   height: number = innerHeight;
+  upscaleResolution: number
 
   components: Component[] = []
 
   constructor(args: EngineArgs) {
+    this.upscaleResolution = args.upscaleResolution || 1
     this.container = args.container
     this.canvas = this.container.querySelector("canvas") as HTMLCanvasElement
     this.ctx = this.canvas.getContext("2d")!
@@ -31,8 +34,8 @@ export class Engine {
     this.height = innerHeight
     this.canvas.style.width = this.width + "px"
     this.canvas.style.height = this.height + "px"
-    this.canvas.width = this.width
-    this.canvas.height = this.height
+    this.canvas.width = this.width * this.upscaleResolution
+    this.canvas.height = this.height * this.upscaleResolution
   }
 
   append(component: Component) {
@@ -62,9 +65,17 @@ export class Engine {
         component.update()
       }
 
+      const ctx = this.ctx
+
+      ctx.save()
+      ctx.scale(this.upscaleResolution, this.upscaleResolution)
+      ctx.clearRect(0, 0, this.width, this.height)
       for (const component of this.components) {
+        ctx.save()
         component.render()
+        ctx.restore()
       }
+      ctx.restore()
     }
     requestAnimationFrame(animate)
   }
