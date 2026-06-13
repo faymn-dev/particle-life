@@ -2,7 +2,6 @@ import type { Component } from "./component";
 
 export interface EngineArgs {
   container: HTMLElement
-  upscaleResolution?: number;
 }
 
 export class Engine {
@@ -12,13 +11,13 @@ export class Engine {
 
   width: number = innerWidth;
   height: number = innerHeight;
-  upscaleResolution: number
 
   components: Component[] = []
 
+
   constructor(args: EngineArgs) {
-    this.upscaleResolution = args.upscaleResolution || 1
     this.container = args.container
+
     this.canvas = this.container.querySelector("canvas") as HTMLCanvasElement
     this.ctx = this.canvas.getContext("2d")!
     this.mount()
@@ -34,8 +33,8 @@ export class Engine {
     this.height = innerHeight
     this.canvas.style.width = this.width + "px"
     this.canvas.style.height = this.height + "px"
-    this.canvas.width = this.width * this.upscaleResolution
-    this.canvas.height = this.height * this.upscaleResolution
+    this.canvas.width = this.width
+    this.canvas.height = this.height
   }
 
   append(component: Component) {
@@ -46,6 +45,13 @@ export class Engine {
 
   remove(component: Component) {
     component.__queuedForDeletion = true
+  }
+
+  /**
+   * Find a list of components by tag
+   */
+  find(tag: string): Component[] {
+    return this.components.filter(c => c.tags.includes(tag))
   }
 
   start() {
@@ -67,15 +73,12 @@ export class Engine {
 
       const ctx = this.ctx
 
-      ctx.save()
-      ctx.scale(this.upscaleResolution, this.upscaleResolution)
       ctx.clearRect(0, 0, this.width, this.height)
       for (const component of this.components) {
         ctx.save()
         component.render()
         ctx.restore()
       }
-      ctx.restore()
     }
     requestAnimationFrame(animate)
   }

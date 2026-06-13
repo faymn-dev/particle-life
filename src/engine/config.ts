@@ -1,28 +1,14 @@
 import { random, randomColor } from "./utils"
 
-export const PARTICLE_RADIUS = 5
-export const NUM_PARTICLE_TYPE = 8
-
-// min and max for the minimum radius for interactions
-export const MIN_MIN = 12
-export const MIN_MAX = 24
-
-// min and max for the maximum radius for interactions
-export const MAX_MIN = 32
-export const MAX_MAX = 64
+export const NUM_PARTICLES = 800
+export const PARTICLE_RADIUS = 3
+export const NUM_PARTICLE_TYPE = 3
 
 // randomize these dynamically  
-
 export const PARTICLE_COLORS = createColors(NUM_PARTICLE_TYPE)
-
-// randomized from -1, 1
-export const INTERACTIONS_MATRIX = 
-
-// randomized from MIN_MIN, MIN_MAX 
-export const MIN_DISTANCE_MATRIX = []
-
-// randomized from MAX_MIN, MAX_MAX 
-export const MAX_DISTANCE_MATRIX = []
+export const INTERACTIONS_MATRIX = createMatrix(NUM_PARTICLE_TYPE, -1, 1)
+export const MIN_DISTANCE_MATRIX = createMatrix(NUM_PARTICLE_TYPE, 12, 24)
+export const MAX_DISTANCE_MATRIX = createMatrix(NUM_PARTICLE_TYPE, 32, 64)
 
 function createColors(count: number) {
   return new Array(count).fill(0).map(() => randomColor())
