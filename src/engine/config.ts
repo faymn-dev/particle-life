@@ -1,10 +1,10 @@
 import { random, randomColor } from "./utils"
 
-export const NUM_PARTICLES = 1000
-export const PARTICLE_RADIUS = 8
-export const NUM_PARTICLE_TYPE = 7
+export const NUM_PARTICLES = 2000
+export const PARTICLE_RADIUS = 4
+export const NUM_PARTICLE_TYPE = 8
 
-export const SPAWN_ZONE_SIZE = 300
+export const SPAWN_ZONE_SIZE = 50
 
 // randomize these dynamically  
 export const PARTICLE_COLORS = createColors(NUM_PARTICLE_TYPE)

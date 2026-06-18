@@ -5,7 +5,6 @@ import "./style.css"
 
 const engine = new Engine({
   container: document.getElementById("app")!,
-  accelerateBy: 2
 })
 
 for (let i = 0; i < NUM_PARTICLES; i++) {

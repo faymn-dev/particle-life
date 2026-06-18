@@ -1,6 +1,6 @@
 import { Component, type ComponentArgs } from "./component"
 import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, PARTICLE_RADIUS, SPAWN_ZONE_SIZE } from "./config"
-import { lerp, random, randomInt, randomVector } from "./utils"
+import { lerp,  randomInt, randomVector } from "./utils"
 import { Vector } from "./vector"
 
 interface ParticleArgs extends ComponentArgs {
