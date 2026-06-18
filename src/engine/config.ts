@@ -1,6 +1,6 @@
 import { random, randomColor } from "./utils"
 
-export const NUM_PARTICLES = 800
+export const NUM_PARTICLES = 800  
 export const PARTICLE_RADIUS = 8
 export const NUM_PARTICLE_TYPE = 7
 

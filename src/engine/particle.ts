@@ -1,5 +1,5 @@
 import { Component, type ComponentArgs } from "./component"
-import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, SEVERE_REPULSION_FACTOR } from "./config"
+import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS } from "./config"
 import { Vector } from "./vector"
 
 interface ParticleArgs extends ComponentArgs {

@@ -1,4 +1,5 @@
 import type { Component } from "./component";
+import { constrain, lerp } from "./utils";
 
 export interface EngineArgs {
   container: HTMLElement;
@@ -17,6 +18,9 @@ export class Engine {
 
   accelerateBy: number
 
+  zoom: number = 1
+  targetZoom: number = 1
+
   constructor(args: EngineArgs) {
     this.container = args.container
     this.accelerateBy = args.accelerateBy ?? 1
@@ -29,11 +33,16 @@ export class Engine {
   private mount() {
     this.resize()
     addEventListener("resize", this.resize.bind(this))
+    addEventListener("wheel", (e) => {
+      this.targetZoom = constrain(this.container.currentCSSZoom - Math.sign(e.deltaY) / 10, 0.1, 2)
+    })
   }
 
   private resize() {
-    this.width = innerWidth
-    this.height = innerHeight
+    const rect = this.container.getBoundingClientRect()
+    this.width = rect.width
+    this.height = rect.height
+
     this.canvas.style.width = this.width + "px"
     this.canvas.style.height = this.height + "px"
     this.canvas.width = this.width
@@ -69,6 +78,9 @@ export class Engine {
           child.unmount()
         }
       }
+
+      this.zoom = lerp(this.zoom, this.targetZoom, 0.2)
+      this.container.style.zoom = `${this.zoom}`
 
       for (let i = 0; i < this.accelerateBy; i++) {
         for (const component of this.components) {

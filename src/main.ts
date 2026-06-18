@@ -2,7 +2,7 @@ import { Engine } from "./engine"
 import { Particle } from "./engine/particle"
 import { random, randomInt } from "./engine/utils"
 import { Vector } from "./engine/vector"
-import * as config from "./engine/config"
+import { NUM_PARTICLES, NUM_PARTICLE_TYPE, PARTICLE_RADIUS } from "./engine/config"
 import "./style.css"
 
 const engine = new Engine({
@@ -10,12 +10,12 @@ const engine = new Engine({
   accelerateBy: 2
 })
 
-for (let i = 0; i < config.NUM_PARTICLES; i++) {
+for (let i = 0; i < NUM_PARTICLES; i++) {
   engine.append(new Particle({
-    pos: new Vector(random(0, engine.width - config.PARTICLE_RADIUS), random(0, engine.height - config.PARTICLE_RADIUS)),
+    pos: new Vector(random(0, engine.width - PARTICLE_RADIUS), random(0, engine.height - PARTICLE_RADIUS)),
     vel: new Vector(random(-1, 1), random(-1, 1)),
-    radius: config.PARTICLE_RADIUS,
-    id: randomInt(0, config.NUM_PARTICLE_TYPE)
+    radius: PARTICLE_RADIUS,
+    id: randomInt(0, NUM_PARTICLE_TYPE)
   }))
 }
 
