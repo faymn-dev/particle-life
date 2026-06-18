@@ -37,9 +37,9 @@ export class Particle extends Component {
   }
 
   update() {
-    // if (particles.length === 0) {
-    const particles = this.engine.find("particle") as Particle[]
-    // }
+    if (particles.length === 0) {
+      particles = this.engine.find("particle") as Particle[]
+    }
 
     this.acc.mult(0)
 

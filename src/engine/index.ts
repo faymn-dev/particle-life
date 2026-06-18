@@ -23,7 +23,8 @@ export class Engine {
   zoom: number = 0.5
   targetZoom: number = 0.5
 
-  camera = new Vector(0, 0);
+  camera = new Vector(0, 0)
+  targetCamera = new Vector(0, 0)
 
   mouse = new Vector(0, 0);
   mouseDown = false
@@ -35,14 +36,24 @@ export class Engine {
     this.canvas = this.container.querySelector("canvas") as HTMLCanvasElement
     this.ctx = this.canvas.getContext("2d")!
     this.mount()
+
+    this.camera = this.center.clone()
+    this.targetCamera = this.center.clone()
   }
 
   private mount() {
     this.resize()
     addEventListener("resize", this.resize.bind(this))
     addEventListener("wheel", (e) => {
-      this.targetZoom = constrain(this.targetZoom - Math.sign(e.deltaY) / 10, 0.1, 2)
-    })
+      e.preventDefault()
+
+      const zoomFactor = 1.1;
+      if (e.deltaY < 0) {
+        this.targetZoom = constrain(this.targetZoom * zoomFactor, 0.1, 2);
+      } else {
+        this.targetZoom = constrain(this.targetZoom / zoomFactor, 0.1, 2);
+      }
+    }, { passive: false })
 
     addEventListener("mousemove", (e) => {
       this.mouse.x = e.clientX
@@ -102,9 +113,9 @@ export class Engine {
       }
 
       if (this.mouseDown) {
-        this.camera.sub(prevMouse.clone().sub(this.mouse))
+        this.targetCamera.add(prevMouse.clone().sub(this.mouse))
       }
-
+      this.camera.moveTowards(this.targetCamera, 0.2)
       this.zoom = lerp(this.zoom, this.targetZoom, 0.2)
 
       for (let i = 0; i < this.accelerateBy; i++) {
@@ -118,8 +129,9 @@ export class Engine {
       ctx.clearRect(0, 0, this.width, this.height)
 
       ctx.save()
-      ctx.translate(this.camera.x, this.camera.y)
+      ctx.translate(this.center.x, this.center.y)
       ctx.scale(this.zoom, this.zoom)
+      ctx.translate(-this.camera.x, -this.camera.y)
       for (const component of this.components) {
         ctx.save()
         component.render()

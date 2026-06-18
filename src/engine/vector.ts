@@ -46,6 +46,11 @@ export class Vector {
     return this
   }
 
+  moveTowards(vector: Vector, t: number): Vector {
+    this.add(vector.clone().sub(this).mult(t))
+    return this
+  }
+
   dot(vector: Vector): number {
     return this.x * vector.x + this.y * vector.y
   }
