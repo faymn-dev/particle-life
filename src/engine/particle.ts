@@ -1,5 +1,6 @@
 import { Component, type ComponentArgs } from "./component"
 import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS } from "./config"
+import { lerp, random, randomInt } from "./utils"
 import { Vector } from "./vector"
 
 interface ParticleArgs extends ComponentArgs {
@@ -18,6 +19,9 @@ export class Particle extends Component {
   radius: number
   id: number
 
+  opacity = 0;
+  targetOpacity = 0.2;
+
   constructor(args: ParticleArgs) {
     super({
       ...args,
@@ -33,9 +37,9 @@ export class Particle extends Component {
   }
 
   update() {
-    if (particles.length === 0) {
-      particles = this.engine.find("particle") as Particle[]
-    }
+    // if (particles.length === 0) {
+    const particles = this.engine.find("particle") as Particle[]
+    // }
 
     this.acc.mult(0)
 
@@ -60,6 +64,10 @@ export class Particle extends Component {
       if (dist < min) {
         // apply repulsion the closer you get
         const force = (1 - min / dist)
+        if (Math.abs(force) >= 10) {
+          this.randomize()
+          continue
+        }
         this.acc.add(direction.mult(force));
       } else {
         const targetDist = (min + max) / 2;
@@ -75,23 +83,31 @@ export class Particle extends Component {
     this.pos.add(this.vel.mult(0.6))
     this.vel.mult(0.5)
 
-    if (this.pos.x - this.radius > this.engine.width) {
-      this.pos.x = -this.radius
-    }
-    if (this.pos.x + this.radius < 0) {
-      this.pos.x = this.engine.width + this.radius
-    }
-    if (this.pos.y - this.radius > this.engine.height) {
-      this.pos.y = -this.radius
-    }
-    if (this.pos.y + this.radius < 0) {
-      this.pos.y = this.engine.height + this.radius
-    }
+    // if (this.pos.x - this.radius > this.engine.width ||
+    //   this.pos.x + this.radius < 0 ||
+    //   this.pos.y - this.radius > this.engine.height ||
+    //   this.pos.y + this.radius < 0
+    // ) {
+    //   this.engine.remove(this)
+    //   // this.randomize()
+    //   // TODO repel away from each wall
+    // }
+  }
+
+  randomize() {
+    this.pos.x = random(this.radius, this.engine.width - this.radius)
+    this.pos.y = random(this.radius, this.engine.height - this.radius)
+    this.vel = new Vector(random(-1, 1), random(-1, 1))
+    this.opacity = 0
+    this.id = randomInt(0, NUM_PARTICLE_TYPE)
   }
 
   render() {
     const ctx = this.engine.ctx
 
+    this.opacity = lerp(this.opacity, this.targetOpacity, 0.1)
+
+    ctx.globalAlpha = this.opacity
     ctx.fillStyle = PARTICLE_COLORS[this.id]
     ctx.beginPath()
     ctx.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI)

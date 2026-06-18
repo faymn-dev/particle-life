@@ -1,5 +1,6 @@
 import type { Component } from "./component";
 import { constrain, lerp } from "./utils";
+import { Vector } from "./vector";
 
 export interface EngineArgs {
   container: HTMLElement;
@@ -13,13 +14,19 @@ export class Engine {
 
   width: number = innerWidth;
   height: number = innerHeight;
+  center: Vector = new Vector(0, 0);
 
   components: Component[] = []
 
   accelerateBy: number
 
-  zoom: number = 1
-  targetZoom: number = 1
+  zoom: number = 0.5
+  targetZoom: number = 0.5
+
+  camera = new Vector(0, 0);
+
+  mouse = new Vector(0, 0);
+  mouseDown = false
 
   constructor(args: EngineArgs) {
     this.container = args.container
@@ -34,7 +41,20 @@ export class Engine {
     this.resize()
     addEventListener("resize", this.resize.bind(this))
     addEventListener("wheel", (e) => {
-      this.targetZoom = constrain(this.container.currentCSSZoom - Math.sign(e.deltaY) / 10, 0.1, 2)
+      this.targetZoom = constrain(this.targetZoom - Math.sign(e.deltaY) / 10, 0.1, 2)
+    })
+
+    addEventListener("mousemove", (e) => {
+      this.mouse.x = e.clientX
+      this.mouse.y = e.clientY
+    })
+
+    addEventListener("mouseup", () => {
+      this.mouseDown = false
+    })
+
+    addEventListener("mousedown", () => {
+      this.mouseDown = true
     })
   }
 
@@ -42,6 +62,7 @@ export class Engine {
     const rect = this.container.getBoundingClientRect()
     this.width = rect.width
     this.height = rect.height
+    this.center = new Vector(this.width / 2, this.height / 2)
 
     this.canvas.style.width = this.width + "px"
     this.canvas.style.height = this.height + "px"
@@ -67,6 +88,7 @@ export class Engine {
   }
 
   start() {
+    let prevMouse = this.mouse.clone()
     const animate = () => {
       requestAnimationFrame(animate)
 
@@ -79,8 +101,11 @@ export class Engine {
         }
       }
 
+      if (this.mouseDown) {
+        this.camera.sub(prevMouse.clone().sub(this.mouse))
+      }
+
       this.zoom = lerp(this.zoom, this.targetZoom, 0.2)
-      this.container.style.zoom = `${this.zoom}`
 
       for (let i = 0; i < this.accelerateBy; i++) {
         for (const component of this.components) {
@@ -91,11 +116,18 @@ export class Engine {
       const ctx = this.ctx
 
       ctx.clearRect(0, 0, this.width, this.height)
+
+      ctx.save()
+      ctx.translate(this.camera.x, this.camera.y)
+      ctx.scale(this.zoom, this.zoom)
       for (const component of this.components) {
         ctx.save()
         component.render()
         ctx.restore()
       }
+      ctx.restore()
+
+      prevMouse = this.mouse.clone()
     }
     requestAnimationFrame(animate)
   }
