@@ -1,6 +1,6 @@
 import { Component, type ComponentArgs } from "./component"
-import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS } from "./config"
-import { lerp, random, randomInt } from "./utils"
+import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, PARTICLE_RADIUS, SPAWN_ZONE_SIZE } from "./config"
+import { lerp, random, randomInt, randomVector } from "./utils"
 import { Vector } from "./vector"
 
 interface ParticleArgs extends ComponentArgs {
@@ -94,12 +94,18 @@ export class Particle extends Component {
     // }
   }
 
+  static createRandomArgs(center: Vector): ParticleArgs {
+    return {
+      pos: randomVector(-SPAWN_ZONE_SIZE, SPAWN_ZONE_SIZE).add(center),
+      vel: randomVector(-1, 1),
+      id: randomInt(0, NUM_PARTICLE_TYPE),
+      radius: PARTICLE_RADIUS
+    }
+  }
+
   randomize() {
-    this.pos.x = random(this.radius, this.engine.width - this.radius)
-    this.pos.y = random(this.radius, this.engine.height - this.radius)
-    this.vel = new Vector(random(-1, 1), random(-1, 1))
+    Object.assign(this, Particle.createRandomArgs(this.engine.center))
     this.opacity = 0
-    this.id = randomInt(0, NUM_PARTICLE_TYPE)
   }
 
   render() {
