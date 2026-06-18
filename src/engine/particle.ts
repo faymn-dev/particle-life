@@ -1,5 +1,5 @@
 import { Component, type ComponentArgs } from "./component"
-import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS } from "./config"
+import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, SEVERE_REPULSION_FACTOR } from "./config"
 import { Vector } from "./vector"
 
 interface ParticleArgs extends ComponentArgs {
@@ -37,26 +37,43 @@ export class Particle extends Component {
       particles = this.engine.find("particle") as Particle[]
     }
 
+    this.acc.mult(0)
+
     for (const particle of particles) {
       if (particle === this) {
         continue
       }
 
-      const strength = INTERACTIONS_MATRIX[this.id][particle.id] / 100
+      const direction = particle.pos.clone().sub(this.pos)
+      const dist = direction.mag()
+
+      const strength = INTERACTIONS_MATRIX[this.id][particle.id]
       const min = MIN_DISTANCE_MATRIX[this.id][particle.id]
       const max = MAX_DISTANCE_MATRIX[this.id][particle.id]
 
-      const direction = particle.pos.clone().sub(this.pos)
-      const dist = direction.mag()
-      if (dist >= min && dist <= max) {
-        this.acc.add(direction.normalize().mult(strength))
+      if (dist > max || Math.abs(dist) <= 0.00001) {
+        continue
+      }
+
+      direction.normalize()
+
+      if (dist < min) {
+        // apply repulsion the closer you get
+        const force = (1 - min / dist)
+        this.acc.add(direction.mult(force));
+      } else {
+        const targetDist = (min + max) / 2;
+        const variance = Math.pow((max - min) / 4, 2); // width of the bell
+
+        const curve = Math.exp(-Math.pow(dist - targetDist, 2) / (2 * variance));
+        const force = strength * curve;
+        this.acc.add(direction.mult(force));
       }
     }
 
-    this.vel.add(this.acc)
-    this.pos.add(this.vel)
-    this.vel.mult(0.99)
-    this.acc.mult(0)
+    this.vel.add(this.acc.mult(0.6))
+    this.pos.add(this.vel.mult(0.6))
+    this.vel.mult(0.5)
 
     if (this.pos.x - this.radius > this.engine.width) {
       this.pos.x = -this.radius

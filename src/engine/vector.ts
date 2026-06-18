@@ -39,6 +39,17 @@ export class Vector {
     return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2))
   }
 
+  limit(scalar: number): Vector {
+    if (this.mag() > scalar) {
+      this.normalize().mult(scalar)
+    }
+    return this
+  }
+
+  dot(vector: Vector): number {
+    return this.x * vector.x + this.y * vector.y
+  }
+
   normalize(): Vector {
     return this.div(this.mag())
   }

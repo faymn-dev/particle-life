@@ -1,7 +1,8 @@
 import type { Component } from "./component";
 
 export interface EngineArgs {
-  container: HTMLElement
+  container: HTMLElement;
+  accelerateBy?: number;
 }
 
 export class Engine {
@@ -14,9 +15,11 @@ export class Engine {
 
   components: Component[] = []
 
+  accelerateBy: number
 
   constructor(args: EngineArgs) {
     this.container = args.container
+    this.accelerateBy = args.accelerateBy ?? 1
 
     this.canvas = this.container.querySelector("canvas") as HTMLCanvasElement
     this.ctx = this.canvas.getContext("2d")!
@@ -67,8 +70,10 @@ export class Engine {
         }
       }
 
-      for (const component of this.components) {
-        component.update()
+      for (let i = 0; i < this.accelerateBy; i++) {
+        for (const component of this.components) {
+          component.update()
+        }
       }
 
       const ctx = this.ctx
