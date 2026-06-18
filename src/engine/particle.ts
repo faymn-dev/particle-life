@@ -1,6 +1,6 @@
 import { Component, type ComponentArgs } from "./component"
 import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, PARTICLE_RADIUS, SPAWN_ZONE_SIZE } from "./config"
-import { lerp,  randomInt, randomVector } from "./utils"
+import { lerp, randomInt, randomVector } from "./utils"
 import { Vector } from "./vector"
 
 interface ParticleArgs extends ComponentArgs {
@@ -20,7 +20,7 @@ export class Particle extends Component {
   id: number
 
   opacity = 0;
-  targetOpacity = 0.2;
+  targetOpacity = 0.3;
 
   constructor(args: ParticleArgs) {
     super({
@@ -79,9 +79,21 @@ export class Particle extends Component {
       }
     }
 
+    // add repulsion away from mouse on click
+    if (this.engine.mouseDown) {
+      const mouse = this.engine.screenToWorld(this.engine.mouse)
+      const direction = this.pos.clone().sub(mouse)
+      const dist = direction.mag()
+      if (dist < 100) {
+        this.acc.add(direction.normalize().mult(100))
+      }
+
+    }
+
     this.vel.add(this.acc.mult(0.6))
     this.pos.add(this.vel.mult(0.6))
     this.vel.mult(0.5)
+
 
     // if (this.pos.x - this.radius > this.engine.width ||
     //   this.pos.x + this.radius < 0 ||
@@ -94,9 +106,9 @@ export class Particle extends Component {
     // }
   }
 
-  static createRandomArgs(center: Vector): ParticleArgs {
+  static createRandomArgs(): ParticleArgs {
     return {
-      pos: randomVector(-SPAWN_ZONE_SIZE, SPAWN_ZONE_SIZE).add(center),
+      pos: randomVector(-SPAWN_ZONE_SIZE, SPAWN_ZONE_SIZE),
       vel: randomVector(-1, 1),
       id: randomInt(0, NUM_PARTICLE_TYPE),
       radius: PARTICLE_RADIUS
@@ -104,7 +116,7 @@ export class Particle extends Component {
   }
 
   randomize() {
-    Object.assign(this, Particle.createRandomArgs(this.engine.center))
+    Object.assign(this, Particle.createRandomArgs())
     this.opacity = 0
   }
 

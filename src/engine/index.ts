@@ -36,9 +36,6 @@ export class Engine {
     this.canvas = this.container.querySelector("canvas") as HTMLCanvasElement
     this.ctx = this.canvas.getContext("2d")!
     this.mount()
-
-    this.camera = this.center.clone()
-    this.targetCamera = this.center.clone()
   }
 
   private mount() {
@@ -98,6 +95,10 @@ export class Engine {
     return this.components.filter(c => c.tags.includes(tag))
   }
 
+  screenToWorld(screen: Vector) {
+    return screen.clone().sub(this.center).div(this.zoom).add(this.camera)
+  }
+
   start() {
     let prevMouse = this.mouse.clone()
     const animate = () => {
@@ -132,12 +133,14 @@ export class Engine {
       ctx.translate(this.center.x, this.center.y)
       ctx.scale(this.zoom, this.zoom)
       ctx.translate(-this.camera.x, -this.camera.y)
+
       for (const component of this.components) {
         ctx.save()
         component.render()
         ctx.restore()
       }
       ctx.restore()
+
 
       prevMouse = this.mouse.clone()
     }

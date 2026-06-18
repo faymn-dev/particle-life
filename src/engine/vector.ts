@@ -26,7 +26,7 @@ export class Vector {
   }
 
   div(scalar: number): Vector {
-    if (scalar == 0) {
+    if (scalar === 0) {
       return this
     }
 

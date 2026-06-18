@@ -8,7 +8,7 @@ const engine = new Engine({
 })
 
 for (let i = 0; i < NUM_PARTICLES; i++) {
-  engine.append(new Particle(Particle.createRandomArgs(engine.center)))
+  engine.append(new Particle(Particle.createRandomArgs()))
 }
 
 engine.start()

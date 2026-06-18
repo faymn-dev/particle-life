@@ -4,7 +4,7 @@ export const NUM_PARTICLES = 2000
 export const PARTICLE_RADIUS = 4
 export const NUM_PARTICLE_TYPE = 8
 
-export const SPAWN_ZONE_SIZE = 50
+export const SPAWN_ZONE_SIZE = random(25, 400)
 
 // randomize these dynamically  
 export const PARTICLE_COLORS = createColors(NUM_PARTICLE_TYPE)
