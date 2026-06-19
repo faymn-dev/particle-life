@@ -1,4 +1,5 @@
 import type { Component } from "./component";
+import { CAMERA_PAN_SPEED, CAMERA_ZOOM_SPEED } from "./config";
 import { constrain, lerp } from "./utils";
 import { Vector } from "./vector";
 
@@ -29,6 +30,8 @@ export class Engine {
   mouse = new Vector(0, 0);
   mouseDown = false
 
+  keys: Set<string> = new Set()
+
   constructor(args: EngineArgs) {
     this.container = args.container
     this.accelerateBy = args.accelerateBy ?? 1
@@ -40,15 +43,24 @@ export class Engine {
 
   private mount() {
     this.resize()
+
     addEventListener("resize", this.resize.bind(this))
+
+    addEventListener("keydown", (e) => {
+      this.keys.add(e.key)
+    })
+
+    addEventListener("keyup", (e) => {
+      this.keys.delete(e.key)
+    })
+
     addEventListener("wheel", (e) => {
       e.preventDefault()
 
-      const zoomFactor = 1.1;
       if (e.deltaY < 0) {
-        this.targetZoom = constrain(this.targetZoom * zoomFactor, 0.1, 2);
+        this.targetZoom = constrain(this.targetZoom * CAMERA_ZOOM_SPEED, 0.1, 2);
       } else {
-        this.targetZoom = constrain(this.targetZoom / zoomFactor, 0.1, 2);
+        this.targetZoom = constrain(this.targetZoom / CAMERA_ZOOM_SPEED, 0.1, 2);
       }
     }, { passive: false })
 
@@ -116,6 +128,20 @@ export class Engine {
       if (this.mouseDown) {
         this.targetCamera.add(prevMouse.clone().sub(this.mouse))
       }
+
+      if (this.keys.has("a")) {
+        this.targetCamera.add(new Vector(-1, 0).mult(CAMERA_PAN_SPEED))
+      }
+      if (this.keys.has("d")) {
+        this.targetCamera.add(new Vector(1, 0).mult(CAMERA_PAN_SPEED))
+      }
+      if (this.keys.has("w")) {
+        this.targetCamera.add(new Vector(0, -1).mult(CAMERA_PAN_SPEED))
+      }
+      if (this.keys.has("s")) {
+        this.targetCamera.add(new Vector(0, 1).mult(CAMERA_PAN_SPEED))
+      }
+
       this.camera.moveTowards(this.targetCamera, 0.2)
       this.zoom = lerp(this.zoom, this.targetZoom, 0.2)
 

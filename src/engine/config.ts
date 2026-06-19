@@ -6,6 +6,9 @@ export const NUM_PARTICLE_TYPE = 8
 
 export const SPAWN_ZONE_SIZE = random(25, 400)
 
+export const CAMERA_PAN_SPEED = 10
+export const CAMERA_ZOOM_SPEED = 1.1 
+
 // randomize these dynamically  
 export const PARTICLE_COLORS = createColors(NUM_PARTICLE_TYPE)
 export const INTERACTIONS_MATRIX = createMatrix(NUM_PARTICLE_TYPE, -1, 1)
