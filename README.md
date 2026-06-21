@@ -2,7 +2,11 @@
 
 Simple interactions between particles (repulsion and attraction) and lead to interesting emergent behaviors resembling life.  
 
-![Preview of particle life](assets/preview.png)
+Here, my implementation is relatively simple and is not accelerated by a GPU. Only about 2,000 particles can be processed without causing intense lag.
+
+![Preview of a collection of around 2,000 particles organizing](./assets/preview.png)
+
+You can pan around with WASD and zoom with scrolling. Clicking will explode particles.
 
 ## Development
 
