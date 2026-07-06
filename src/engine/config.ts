@@ -6,8 +6,8 @@ export const NUM_PARTICLE_TYPE = 8
 
 export const SPAWN_ZONE_SIZE = random(25, 400)
 
-export const WALL_WIDTH = 600
-export const WALL_HEIGHT = 600
+export const WALL_WIDTH = 600 // refers to half of the width
+export const WALL_HEIGHT = 600 // refers to half of the height
 export const WALL_THICKNESS = 10
 
 export const CAMERA_PAN_SPEED = 10

@@ -1,5 +1,5 @@
 import { Component, type ComponentArgs } from "../component"
-import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, PARTICLE_RADIUS, SPAWN_ZONE_SIZE } from "../config"
+import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, PARTICLE_RADIUS, SPAWN_ZONE_SIZE, WALL_HEIGHT, WALL_WIDTH } from "../config"
 import { isApproxEqual, lerp, randomInt, randomVector } from "../utils"
 import { Vector } from "../vector"
 import type { Wall } from "./wall"
@@ -65,6 +65,11 @@ export class Particle extends Component {
         const force = (1 - min / dist)
         this.acc.add(direction.mult(force));
       }
+    }
+
+    if (this.pos.x >= WALL_WIDTH || this.pos.x <= -WALL_WIDTH || this.pos.y >= WALL_HEIGHT || this.pos.y <= -WALL_HEIGHT) {
+      this.randomize()
+      return
     }
 
     for (const particle of particles) {
