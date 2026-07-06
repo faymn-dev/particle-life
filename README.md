@@ -1,12 +1,16 @@
 # Particle Life 
 
-Simple interactions between particles (repulsion and attraction) and lead to interesting emergent behaviors resembling life.  
+In this experiment, nonlinear particle interactions (repulsion and attraction) lead to emergent behaviors that resemble life.
 
-Here, my implementation is relatively simple and is not accelerated by a GPU. Only about 2,000 particles can be processed without causing intense lag.
+Here, our implementation is simple and not GPU acclerated. As a result, only about 2,000 particles can be processed without lag.
 
-![Preview of a collection of around 2,000 particles organizing](./assets/preview.png)
+![Preview of a collection of around 2,000 particles organizing into "life"](./assets/preview.png)
 
-You can pan around with WASD and zoom with scrolling. Clicking will explode particles.
+## Controls
+
+- WASD or drag to pan camera 
+- scroll to zoom camera in and out
+- Press space to explode particles away from your cursor
 
 ## Development
 
@@ -16,3 +20,4 @@ npm run dev # run development server
 ```
 
 Interactions are randomized, but can be modified in `/src/engine/config.ts` 
+

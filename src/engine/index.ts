@@ -1,5 +1,6 @@
 import type { Component } from "./component";
 import { CAMERA_PAN_SPEED, CAMERA_ZOOM_SPEED } from "./config";
+import { Mouse } from "./mouse";
 import { constrain, lerp } from "./utils";
 import { Vector } from "./vector";
 
@@ -27,8 +28,7 @@ export class Engine {
   camera = new Vector(0, 0)
   targetCamera = new Vector(0, 0)
 
-  mouse = new Vector(0, 0);
-  mouseDown = false
+  mouse = new Mouse()
 
   keys: Set<string> = new Set()
 
@@ -64,18 +64,7 @@ export class Engine {
       }
     }, { passive: false })
 
-    addEventListener("mousemove", (e) => {
-      this.mouse.x = e.clientX
-      this.mouse.y = e.clientY
-    })
-
-    addEventListener("mouseup", () => {
-      this.mouseDown = false
-    })
-
-    addEventListener("mousedown", () => {
-      this.mouseDown = true
-    })
+    this.mouse.mount()
   }
 
   private resize() {
@@ -112,7 +101,6 @@ export class Engine {
   }
 
   start() {
-    let prevMouse = this.mouse.clone()
     const animate = () => {
       requestAnimationFrame(animate)
 
@@ -125,8 +113,8 @@ export class Engine {
         }
       }
 
-      if (this.mouseDown) {
-        this.targetCamera.add(prevMouse.clone().sub(this.mouse))
+      if (this.mouse.down) {
+        this.targetCamera.add(this.mouse.delta)
       }
 
       if (this.keys.has("a")) {
@@ -167,8 +155,7 @@ export class Engine {
       }
       ctx.restore()
 
-
-      prevMouse = this.mouse.clone()
+      this.mouse.update()
     }
     requestAnimationFrame(animate)
   }

@@ -80,30 +80,18 @@ export class Particle extends Component {
     }
 
     // add repulsion away from mouse on click
-    if (this.engine.mouseDown) {
+    if (this.engine.keys.has(" ")) {
       const mouse = this.engine.screenToWorld(this.engine.mouse)
       const direction = this.pos.clone().sub(mouse)
       const dist = direction.mag()
       if (dist < 100) {
         this.acc.add(direction.normalize().mult(100))
       }
-
     }
 
     this.vel.add(this.acc.mult(0.6))
     this.pos.add(this.vel.mult(0.6))
     this.vel.mult(0.5)
-
-
-    // if (this.pos.x - this.radius > this.engine.width ||
-    //   this.pos.x + this.radius < 0 ||
-    //   this.pos.y - this.radius > this.engine.height ||
-    //   this.pos.y + this.radius < 0
-    // ) {
-    //   this.engine.remove(this)
-    //   // this.randomize()
-    //   // TODO repel away from each wall
-    // }
   }
 
   static createRandomArgs(): ParticleArgs {
