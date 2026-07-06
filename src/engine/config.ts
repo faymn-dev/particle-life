@@ -6,8 +6,12 @@ export const NUM_PARTICLE_TYPE = 8
 
 export const SPAWN_ZONE_SIZE = random(25, 400)
 
+export const WALL_WIDTH = 600
+export const WALL_HEIGHT = 600
+export const WALL_THICKNESS = 10
+
 export const CAMERA_PAN_SPEED = 10
-export const CAMERA_ZOOM_SPEED = 1.1 
+export const CAMERA_ZOOM_SPEED = 1.1
 
 // randomize these dynamically  
 export const PARTICLE_COLORS = createColors(NUM_PARTICLE_TYPE)

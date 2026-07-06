@@ -1,7 +1,8 @@
-import { Component, type ComponentArgs } from "./component"
-import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, PARTICLE_RADIUS, SPAWN_ZONE_SIZE } from "./config"
-import { lerp, randomInt, randomVector } from "./utils"
-import { Vector } from "./vector"
+import { Component, type ComponentArgs } from "../component"
+import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, PARTICLE_RADIUS, SPAWN_ZONE_SIZE } from "../config"
+import { isApproxEqual, lerp, randomInt, randomVector } from "../utils"
+import { Vector } from "../vector"
+import type { Wall } from "./wall"
 
 interface ParticleArgs extends ComponentArgs {
   pos: Vector
@@ -11,6 +12,7 @@ interface ParticleArgs extends ComponentArgs {
 }
 
 let particles: Particle[] = []
+let walls: Wall[] = []
 
 export class Particle extends Component {
   pos: Vector
@@ -36,12 +38,34 @@ export class Particle extends Component {
     }
   }
 
+  private distanceTo(wall: Wall): Vector {
+    let isVertical = wall.height > wall.width
+    if (isVertical) {
+      return new Vector(wall.pos.x, this.pos.y).sub(this.pos)
+    }
+    return new Vector(this.pos.x, wall.pos.y).sub(this.pos)
+  }
+
   update() {
+    // get references to appropriate components
     if (particles.length === 0) {
       particles = this.engine.find("particle") as Particle[]
     }
+    if (walls.length === 0) {
+      walls = this.engine.find("wall") as Wall[]
+    }
 
     this.acc.mult(0)
+
+    for (const wall of walls) {
+      const direction = this.distanceTo(wall)
+      const dist = direction.mag()
+      const min = 20
+      if (dist < min) {
+        const force = (1 - min / dist)
+        this.acc.add(direction.mult(force));
+      }
+    }
 
     for (const particle of particles) {
       if (particle === this) {
@@ -55,7 +79,7 @@ export class Particle extends Component {
       const min = MIN_DISTANCE_MATRIX[this.id][particle.id]
       const max = MAX_DISTANCE_MATRIX[this.id][particle.id]
 
-      if (dist > max || Math.abs(dist) <= 0.00001) {
+      if (dist > max || isApproxEqual(dist, 0, 0.00001)) {
         continue
       }
 
