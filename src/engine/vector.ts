@@ -1,3 +1,5 @@
+import { MAX_INTERACTION_DISTANCE } from "./config";
+
 export class Vector {
   x: number;
   y: number;
@@ -65,5 +67,25 @@ export class Vector {
 
   clone(): Vector {
     return new Vector(this.x, this.y)
+  }
+
+  floor(): Vector {
+    this.x = Math.floor(this.x)
+    this.y = Math.floor(this.y)
+
+    return this
+  }
+
+  static fromId(id: string) {
+    const [x, y] = id.split(',')
+    return new Vector(parseInt(x), parseInt(y))
+  }
+
+  toString() {
+    return `${this.x},${this.y}`
+  }
+
+  toIdVector() {
+    return this.clone().div(MAX_INTERACTION_DISTANCE).floor();
   }
 }

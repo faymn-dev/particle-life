@@ -14,6 +14,8 @@ interface ParticleArgs extends ComponentArgs {
 let particles: Particle[] = []
 let walls: Wall[] = []
 
+let grid: Record<string, Particle[]> | null = null;
+
 export class Particle extends Component {
   pos: Vector
   vel: Vector
@@ -46,13 +48,50 @@ export class Particle extends Component {
     return new Vector(this.pos.x, wall.pos.y).sub(this.pos)
   }
 
+
+  // TODO refactor this so these are engine methods or in some kind of ParticleManager class
+  // this feels kind of bad
+  static computeGrid() {
+    grid = {}
+    for (const particle of particles) {
+      const id = particle.pos.toIdVector().toString()
+      if (!(id in grid)) {
+        grid[id] = []
+      }
+      grid[id].push(particle)
+    }
+  }
+
+
+  private getNeighbors(): Particle[] {
+    const results: Particle[] = []
+    if (!grid) {
+      return results
+    }
+
+    const id = this.pos.toIdVector()
+    for (let x = -1; x <= 1; x++) {
+      for (let y = -1; y <= 1; y++) {
+        const neighborId = id.clone().add(new Vector(x, y)).toString()
+        results.push(...(grid[neighborId] || []))
+      }
+    }
+
+    return results
+  }
+
   update() {
     // get references to appropriate components
     if (particles.length === 0) {
       particles = this.engine.find("particle") as Particle[]
     }
+
     if (walls.length === 0) {
       walls = this.engine.find("wall") as Wall[]
+    }
+
+    if (grid === null) {
+      Particle.computeGrid();
     }
 
     this.acc.mult(0)
@@ -72,7 +111,7 @@ export class Particle extends Component {
       return
     }
 
-    for (const particle of particles) {
+    for (const particle of this.getNeighbors()) {
       if (particle === this) {
         continue
       }
@@ -138,6 +177,9 @@ export class Particle extends Component {
   }
 
   render() {
+    // render happens after update, so this resets the grid
+    grid = null;
+
     const ctx = this.engine.ctx
 
     this.opacity = lerp(this.opacity, this.targetOpacity, 0.1)
