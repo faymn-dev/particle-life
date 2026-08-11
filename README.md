@@ -2,7 +2,7 @@
 
 In this experiment, nonlinear particle interactions (repulsion and attraction) lead to emergent behaviors that resemble life.
 
-Here, our implementation is simple and not GPU acclerated. As a result, only about 2,000 particles can be processed without lag.
+Here, our implementation is simple and not GPU acclerated. As a result, only about 10,000 particles can be processed without lag.
 
 ![Preview of a collection of around 2,000 particles organizing into "life"](./assets/preview.png)
 
