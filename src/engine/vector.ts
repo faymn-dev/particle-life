@@ -1,4 +1,4 @@
-import { MAX_INTERACTION_DISTANCE } from "./config";
+import { CELL_SIZE, GRID_COLS, WALL_HEIGHT, WALL_WIDTH } from "./config";
 
 export class Vector {
   x: number;
@@ -76,16 +76,9 @@ export class Vector {
     return this
   }
 
-  static fromId(id: string) {
-    const [x, y] = id.split(',')
-    return new Vector(parseInt(x), parseInt(y))
-  }
-
-  toString() {
-    return `${this.x},${this.y}`
-  }
-
-  toIdVector() {
-    return this.clone().div(MAX_INTERACTION_DISTANCE).floor();
+  getCellIndex(): number {
+    const cellX = Math.floor((this.x + WALL_WIDTH) / CELL_SIZE);
+    const cellY = Math.floor((this.y + WALL_HEIGHT) / CELL_SIZE);
+    return cellX + cellY * GRID_COLS;
   }
 }

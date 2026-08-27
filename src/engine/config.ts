@@ -1,25 +1,27 @@
 import { random, randomColor } from "./utils"
 
-export const NUM_PARTICLES = 10000
-export const PARTICLE_RADIUS = 4
+export const NUM_PARTICLES = 7500
+export const PARTICLE_RADIUS = 5
 export const NUM_PARTICLE_TYPE = 8
 
-export const SPAWN_ZONE_SIZE = random(500, 700)
+export const SPAWN_ZONE_SIZE = random(300, 600)
 
-export const WALL_WIDTH = 1000 // refers to half of the width
-export const WALL_HEIGHT = 1000 // refers to half of the height
+export const WALL_WIDTH = 700 // refers to half of the width
+export const WALL_HEIGHT = 700 // refers to half of the height
 export const WALL_THICKNESS = 10
 
 export const CAMERA_PAN_SPEED = 10
 export const CAMERA_ZOOM_SPEED = 1.1
 
-export const MAX_INTERACTION_DISTANCE = 64
+export const CELL_SIZE = 64
+export const GRID_COLS = Math.ceil(WALL_WIDTH * 2 / CELL_SIZE)
+export const GRID_ROWS = Math.ceil(WALL_HEIGHT * 2 / CELL_SIZE)
 
 // randomize these dynamically  
 export const PARTICLE_COLORS = createColors(NUM_PARTICLE_TYPE)
 export const INTERACTIONS_MATRIX = createMatrix(NUM_PARTICLE_TYPE, -1, 1)
 export const MIN_DISTANCE_MATRIX = createMatrix(NUM_PARTICLE_TYPE, 12, 24)
-export const MAX_DISTANCE_MATRIX = createMatrix(NUM_PARTICLE_TYPE, 32, MAX_INTERACTION_DISTANCE)
+export const MAX_DISTANCE_MATRIX = createMatrix(NUM_PARTICLE_TYPE, 32, 64)
 
 function createColors(count: number) {
   return new Array(count).fill(0).map(() => randomColor())

@@ -1,4 +1,5 @@
 import type { Engine } from "."
+import { randomId } from "./utils"
 
 export interface ComponentArgs {
   tags?: string[]
@@ -9,16 +10,20 @@ export class Component {
   // only guaranteed to exist in lifecycle methods, like mount, unmount, update and render
   engine!: Engine
 
-  tags: string[]
 
   parent: Component | null = null
   components: Component[]
 
   __queuedForDeletion: boolean = false
 
-  constructor(args: ComponentArgs) {
-    this.tags = args.tags || []
-    this.components = args.children || []
+  readonly id: string
+  readonly tags: string[]
+
+
+  constructor({ tags = [], children = [] }: ComponentArgs) {
+    this.id = randomId()
+    this.tags = tags
+    this.components = children
   }
 
   append(component: Component) {

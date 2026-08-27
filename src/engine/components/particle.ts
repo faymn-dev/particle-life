@@ -1,5 +1,5 @@
 import { Component, type ComponentArgs } from "../component"
-import { INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, PARTICLE_RADIUS, SPAWN_ZONE_SIZE, WALL_HEIGHT, WALL_WIDTH } from "../config"
+import { GRID_COLS, INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, PARTICLE_RADIUS, SPAWN_ZONE_SIZE, WALL_HEIGHT, WALL_WIDTH } from "../config"
 import { isApproxEqual, lerp, randomInt, randomVector } from "../utils"
 import { Vector } from "../vector"
 import type { Wall } from "./wall"
@@ -8,20 +8,16 @@ interface ParticleArgs extends ComponentArgs {
   pos: Vector
   vel?: Vector
   radius: number;
-  id: number;
+  variant: number;
 }
 
-let particles: Particle[] = []
-let walls: Wall[] = []
-
-let grid: Record<string, Particle[]> | null = null;
 
 export class Particle extends Component {
   pos: Vector
   vel: Vector
   acc = new Vector()
   radius: number
-  id: number
+  variant: number
 
   opacity = 0;
   targetOpacity = 0.3;
@@ -34,8 +30,8 @@ export class Particle extends Component {
     this.pos = args.pos
     this.vel = args.vel || new Vector()
     this.radius = args.radius
-    this.id = args.id
-    if (this.id < 0 || this.id >= NUM_PARTICLE_TYPE) {
+    this.variant = args.variant
+    if (this.variant < 0 || this.variant >= NUM_PARTICLE_TYPE) {
       throw new Error("invalid particle id")
     }
   }
@@ -48,32 +44,19 @@ export class Particle extends Component {
     return new Vector(this.pos.x, wall.pos.y).sub(this.pos)
   }
 
-
-  // TODO refactor this so these are engine methods or in some kind of ParticleManager class
-  // this feels kind of bad
-  static computeGrid() {
-    grid = {}
-    for (const particle of particles) {
-      const id = particle.pos.toIdVector().toString()
-      if (!(id in grid)) {
-        grid[id] = []
-      }
-      grid[id].push(particle)
-    }
-  }
-
-
   private getNeighbors(): Particle[] {
-    const results: Particle[] = []
-    if (!grid) {
-      return results
+    if (!this.engine.grid) {
+      return []
     }
 
-    const id = this.pos.toIdVector()
+    const results: Particle[] = []
+    const id = this.pos.getCellIndex()
     for (let x = -1; x <= 1; x++) {
       for (let y = -1; y <= 1; y++) {
-        const neighborId = id.clone().add(new Vector(x, y)).toString()
-        results.push(...(grid[neighborId] || []))
+        const neighborId = id + x + (y * GRID_COLS)
+        if (neighborId >= 0 && neighborId < this.engine.grid.length) {
+          results.push(...this.engine.grid[neighborId])
+        }
       }
     }
 
@@ -81,21 +64,9 @@ export class Particle extends Component {
   }
 
   update() {
-    // get references to appropriate components
-    if (particles.length === 0) {
-      particles = this.engine.find("particle") as Particle[]
-    }
-
-    if (walls.length === 0) {
-      walls = this.engine.find("wall") as Wall[]
-    }
-
-    if (grid === null) {
-      Particle.computeGrid();
-    }
-
     this.acc.mult(0)
 
+    const walls = this.engine.find<Wall>("wall")
     for (const wall of walls) {
       const direction = this.distanceTo(wall)
       const dist = direction.mag()
@@ -119,9 +90,9 @@ export class Particle extends Component {
       const direction = particle.pos.clone().sub(this.pos)
       const dist = direction.mag()
 
-      const strength = INTERACTIONS_MATRIX[this.id][particle.id]
-      const min = MIN_DISTANCE_MATRIX[this.id][particle.id]
-      const max = MAX_DISTANCE_MATRIX[this.id][particle.id]
+      const strength = INTERACTIONS_MATRIX[this.variant][particle.variant]
+      const min = MIN_DISTANCE_MATRIX[this.variant][particle.variant]
+      const max = MAX_DISTANCE_MATRIX[this.variant][particle.variant]
 
       if (dist > max || isApproxEqual(dist, 0, 0.00001)) {
         continue
@@ -166,7 +137,7 @@ export class Particle extends Component {
     return {
       pos: randomVector(-SPAWN_ZONE_SIZE, SPAWN_ZONE_SIZE),
       vel: randomVector(-1, 1),
-      id: randomInt(0, NUM_PARTICLE_TYPE),
+      variant: randomInt(0, NUM_PARTICLE_TYPE),
       radius: PARTICLE_RADIUS
     }
   }
@@ -177,15 +148,12 @@ export class Particle extends Component {
   }
 
   render() {
-    // render happens after update, so this resets the grid
-    grid = null;
-
     const ctx = this.engine.ctx
 
     this.opacity = lerp(this.opacity, this.targetOpacity, 0.1)
 
     ctx.globalAlpha = this.opacity
-    ctx.fillStyle = PARTICLE_COLORS[this.id]
+    ctx.fillStyle = PARTICLE_COLORS[this.variant]
     ctx.beginPath()
     ctx.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI)
     ctx.fill()

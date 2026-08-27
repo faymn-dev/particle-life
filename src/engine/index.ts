@@ -1,8 +1,10 @@
 import type { Component } from "./component";
-import { CAMERA_PAN_SPEED, CAMERA_ZOOM_SPEED } from "./config";
+import type { Particle } from "./components/particle";
+import { CAMERA_PAN_SPEED, CAMERA_ZOOM_SPEED, GRID_COLS, GRID_ROWS } from "./config";
 import { Mouse } from "./mouse";
 import { constrain, lerp } from "./utils";
 import { Vector } from "./vector";
+
 
 export interface EngineArgs {
   container: HTMLElement;
@@ -19,6 +21,7 @@ export class Engine {
   center: Vector = new Vector(0, 0);
 
   components: Component[] = []
+  tags: Record<string, Record<string, Component>> = {}
 
   accelerateBy: number
 
@@ -29,8 +32,9 @@ export class Engine {
   targetCamera = new Vector(0, 0)
 
   mouse = new Mouse()
-
   keys: Set<string> = new Set()
+
+  grid: Particle[][] = Array.from({ length: GRID_COLS * GRID_ROWS }, () => [])
 
   constructor(args: EngineArgs) {
     this.container = args.container
@@ -82,6 +86,12 @@ export class Engine {
   append(component: Component) {
     component.engine = this
     this.components.push(component)
+    for (const tag of component.tags) {
+      if (!(tag in this.tags)) {
+        this.tags[tag] = {}
+      }
+      this.tags[tag][component.id] = component
+    }
     component.mount()
   }
 
@@ -92,8 +102,11 @@ export class Engine {
   /**
    * Find a list of components by tag
    */
-  find(tag: string): Component[] {
-    return this.components.filter(c => c.tags.includes(tag))
+  find<T extends Component>(tag: string): T[] {
+    if (tag in this.tags) {
+      return Object.values(this.tags[tag]) as T[]
+    }
+    return []
   }
 
   screenToWorld(screen: Vector) {
@@ -109,6 +122,9 @@ export class Engine {
         const child = this.components[i]
         if (child.__queuedForDeletion) {
           this.components.splice(i, 1)
+          for (const tag in this.tags) {
+            delete this.tags[tag][child.id]
+          }
           child.unmount()
         }
       }
@@ -132,6 +148,8 @@ export class Engine {
 
       this.camera.moveTowards(this.targetCamera, 0.2)
       this.zoom = lerp(this.zoom, this.targetZoom, 0.2)
+
+      this.computeGrid()
 
       for (let i = 0; i < this.accelerateBy; i++) {
         for (const component of this.components) {
@@ -158,5 +176,16 @@ export class Engine {
       this.mouse.update()
     }
     requestAnimationFrame(animate)
+  }
+
+  computeGrid() {
+    for (let i = 0; i < this.grid.length; i++) {
+      this.grid[i].length = 0 // clear without reallocating
+    }
+
+    const particles = this.find<Particle>("particle")
+    for (const particle of particles) {
+      this.grid[particle.pos.getCellIndex()].push(particle)
+    }
   }
 }
