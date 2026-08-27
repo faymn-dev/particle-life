@@ -30,7 +30,6 @@ export function randomizeConfig() {
   INTERACTIONS_MATRIX = createMatrix(NUM_PARTICLE_TYPE, -1, 1)
   MIN_DISTANCE_MATRIX = createMatrix(NUM_PARTICLE_TYPE, 12, 24)
   MAX_DISTANCE_MATRIX = createMatrix(NUM_PARTICLE_TYPE, 32, 64)
-  randomUtils.saveState()
 }
 
 function createColors(count: number) {

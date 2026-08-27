@@ -15,7 +15,8 @@ addComponents()
 engine.start()
 
 function addComponents() {
-  randomUtils.restoreState()
+  engine.nuke()
+
   for (let i = 0; i < NUM_PARTICLES; i++) {
     engine.append(new Particle(Particle.createRandomArgs()))
   }
@@ -35,15 +36,16 @@ optionSeed.addEventListener("click", () => {
 })
 
 optionRestart.addEventListener("click", () => {
-  engine.nuke()
+  randomUtils.restore()
+  randomizeConfig()
   addComponents()
 })
 
 optionRandom.addEventListener("click", () => {
-  engine.nuke()
   randomUtils.setRandomSeed()
-  randomizeConfig()
   updateSeed()
+
+  randomizeConfig()
   addComponents()
 })
 

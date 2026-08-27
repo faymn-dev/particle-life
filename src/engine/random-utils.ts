@@ -4,15 +4,16 @@ import { Vector } from "./vector";
 export class RandomUtils {
   private seed: number;
   private generator: RandomGenerator;
-  private states: number[] = []
+  private savedState: number;
 
   constructor() {
-    this.seed = parseInt(window.location.hash.substring(1))
+    this.seed = Math.abs(parseInt(window.location.hash.substring(1)))
     if (isNaN(this.seed)) {
       this.seed = this.randomSeed()
     }
     this.seed = this.seed
     this.generator = new RandomGenerator(this.seed)
+    this.savedState = this.seed
   }
 
   private randomSeed(): number {
@@ -22,6 +23,7 @@ export class RandomUtils {
   setRandomSeed() {
     this.seed = this.randomSeed()
     this.generator.setState(this.seed)
+    this.savedState = this.seed
   }
 
   getSeed() {
@@ -36,12 +38,10 @@ export class RandomUtils {
     return this.generator.getState()
   }
 
-  saveState() {
-    this.states.push(this.getState())
-  }
-
-  restoreState() {
-    this.setState(this.states.pop() ?? this.seed)
+  // go back to the last saved state
+  restore() {
+    this.seed = this.savedState
+    this.generator.setState(this.seed)
   }
 
 
