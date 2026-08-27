@@ -1,8 +1,9 @@
 import { Component, type ComponentArgs } from "../component"
 import { GRID_COLS, INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, PARTICLE_RADIUS, SPAWN_ZONE_SIZE, WALL_HEIGHT, WALL_WIDTH } from "../config"
-import { isApproxEqual, lerp, randomInt, randomVector } from "../utils"
+import { isApproxEqual, lerp } from "../utils"
 import { Vector } from "../vector"
 import type { Wall } from "./wall"
+import { randomUtils } from "../random-utils"
 
 interface ParticleArgs extends ComponentArgs {
   pos: Vector
@@ -135,9 +136,9 @@ export class Particle extends Component {
 
   static createRandomArgs(): ParticleArgs {
     return {
-      pos: randomVector(-SPAWN_ZONE_SIZE, SPAWN_ZONE_SIZE),
-      vel: randomVector(-1, 1),
-      variant: randomInt(0, NUM_PARTICLE_TYPE),
+      pos: randomUtils.vector(-SPAWN_ZONE_SIZE, SPAWN_ZONE_SIZE),
+      vel: randomUtils.vector(-1, 1),
+      variant: randomUtils.int(0, NUM_PARTICLE_TYPE),
       radius: PARTICLE_RADIUS
     }
   }

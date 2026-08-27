@@ -1,7 +1,7 @@
 *,
 ::before,
 ::after {
-  box-sizing: border;
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
@@ -22,17 +22,38 @@ body {
   height: 100vh;
 }
 
-#app__seed {
+.options {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   bottom: 1rem;
-  background-color: white;
-  font-family: monospace;
-  padding: 0.25rem 0.5rem ;
+  display: flex; 
+  gap: 0.5rem;
+  z-index: 10;
 }
 
-#app__seed::before {
+.option {
+  background-color: white;
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.5rem;
+  padding: 0 0.5rem;
+  cursor: pointer;
+}
+
+.option:hover {
+  background-color: #eee;
+}
+
+.option--square {
+  width: 1.5rem;
+  padding: 0.25rem;
+}
+
+
+#seed::before {
   content: "#";
   color: #777;
 }

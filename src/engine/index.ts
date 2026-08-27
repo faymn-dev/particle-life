@@ -1,8 +1,8 @@
 import type { Component } from "./component";
 import type { Particle } from "./components/particle";
-import { CAMERA_PAN_SPEED, CAMERA_ZOOM_SPEED, GRID_COLS, GRID_ROWS } from "./config";
+import { CAMERA_PAN_SPEED, CAMERA_ZOOM_SPEED } from "./config";
 import { Mouse } from "./mouse";
-import { constrain, lerp } from "./utils";
+import { constrain, initGrid, lerp } from "./utils";
 import { Vector } from "./vector";
 
 
@@ -34,7 +34,7 @@ export class Engine {
   mouse = new Mouse()
   keys: Set<string> = new Set()
 
-  grid: Particle[][] = Array.from({ length: GRID_COLS * GRID_ROWS }, () => [])
+  grid: Particle[][] = initGrid()
 
   constructor(args: EngineArgs) {
     this.container = args.container
@@ -187,5 +187,18 @@ export class Engine {
     for (const particle of particles) {
       this.grid[particle.pos.getCellIndex()].push(particle)
     }
+  }
+
+  // delete all game objects
+  nuke() {
+    this.components = []
+    this.tags = {}
+    this.grid = initGrid()
+
+    this.zoom = 0.5
+    this.targetZoom = 0.5
+
+    this.camera = new Vector(0, 0)
+    this.targetCamera = new Vector(0, 0)
   }
 }

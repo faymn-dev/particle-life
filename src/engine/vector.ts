@@ -1,4 +1,5 @@
-import { CELL_SIZE, GRID_COLS, WALL_HEIGHT, WALL_WIDTH } from "./config";
+import { CELL_SIZE, GRID_COLS, GRID_ROWS, WALL_HEIGHT, WALL_WIDTH } from "./config";
+import { constrain } from "./utils";
 
 export class Vector {
   x: number;
@@ -79,6 +80,6 @@ export class Vector {
   getCellIndex(): number {
     const cellX = Math.floor((this.x + WALL_WIDTH) / CELL_SIZE);
     const cellY = Math.floor((this.y + WALL_HEIGHT) / CELL_SIZE);
-    return cellX + cellY * GRID_COLS;
+    return constrain(cellX + cellY * GRID_COLS, 0, GRID_COLS * GRID_ROWS)
   }
 }
