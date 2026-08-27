@@ -14,6 +14,25 @@ body {
 }
 
 #app {
+  position: relative;
+}
+
+#app, #app__canvas {
   width: 100vw;
   height: 100vh;
+}
+
+#app__seed {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 1rem;
+  background-color: white;
+  font-family: monospace;
+  padding: 0.25rem 0.5rem ;
+}
+
+#app__seed::before {
+  content: "#";
+  color: #777;
 }

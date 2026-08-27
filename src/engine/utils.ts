@@ -1,7 +1,12 @@
 import { Generator } from "./generator"
 import { Vector } from "./vector"
 
-const generator = new Generator(1)
+export let seed = parseInt(window.location.hash.substring(1))
+if (isNaN(seed)) {
+  seed = Math.floor(Math.random() * 1000)
+}
+
+export const generator = new Generator(seed)
 
 export const random = (min: number = 0, max: number = 1) => generator.next() * (max - min) + min
 

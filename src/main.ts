@@ -2,8 +2,13 @@ import { Engine } from "./engine"
 import { Particle } from "./engine/components/particle"
 import { Wall } from "./engine/components/wall"
 import { NUM_PARTICLES, WALL_WIDTH, WALL_HEIGHT, WALL_THICKNESS } from "./engine/config"
+import { seed } from "./engine/utils"
 import { Vector } from "./engine/vector"
 import "./style.css"
+
+document.getElementById("app__seed")!.textContent = seed.toString().padStart(4, "0")
+window.location.hash = seed.toString()
+
 
 const engine = new Engine({
   container: document.getElementById("app")!,
