@@ -10,7 +10,6 @@ export class Component {
   // only guaranteed to exist in lifecycle methods, like mount, unmount, update and render
   engine!: Engine
 
-
   parent: Component | null = null
   components: Component[]
 
@@ -18,7 +17,6 @@ export class Component {
 
   readonly id: string
   readonly tags: string[]
-
 
   constructor({ tags = [], children = [] }: ComponentArgs) {
     this.id = randomId()

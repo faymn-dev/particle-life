@@ -80,6 +80,6 @@ export class Vector {
   getCellIndex(): number {
     const cellX = Math.floor((this.x + WALL_WIDTH) / CELL_SIZE);
     const cellY = Math.floor((this.y + WALL_HEIGHT) / CELL_SIZE);
-    return constrain(cellX + cellY * GRID_COLS, 0, GRID_COLS * GRID_ROWS)
+    return constrain(cellX + cellY * GRID_COLS, 0, GRID_COLS * GRID_ROWS - 1)
   }
 }
