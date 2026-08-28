@@ -31,6 +31,8 @@ const optionSeed = document.getElementById("seed")!
 const optionRestart = document.getElementById("restart")!
 const optionRandom = document.getElementById("random")!
 
+updateSeed()
+
 optionSeed.addEventListener("click", () => {
   navigator.clipboard.writeText(window.location.href);
 })
@@ -43,15 +45,25 @@ optionRestart.addEventListener("click", () => {
 
 optionRandom.addEventListener("click", () => {
   randomUtils.setRandomSeed()
-  updateSeed()
-
-  randomizeConfig()
-  addComponents()
+  onSeedChange()
 })
 
-updateSeed()
+
+addEventListener("hashchange", () => {
+  randomUtils.setSeed(-1)
+  onSeedChange()
+})
 
 function updateSeed() {
   optionSeed.textContent = randomUtils.getSeed().toString().padStart(4, "0")
-  window.location.hash = randomUtils.getSeed().toString()
+  const nextHash = `#${randomUtils.getSeed().toString()}`
+  if (nextHash != window.location.hash) {
+    window.history.pushState(null, '', nextHash) // silently update hash
+  }
+}
+
+function onSeedChange() {
+  updateSeed()
+  randomizeConfig()
+  addComponents()
 }

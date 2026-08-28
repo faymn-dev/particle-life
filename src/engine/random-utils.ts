@@ -2,28 +2,30 @@ import { RandomGenerator } from "./random-generator";
 import { Vector } from "./vector";
 
 export class RandomUtils {
-  private seed: number;
-  private generator: RandomGenerator;
-  private savedState: number;
+  private seed!: number;
+  private generator!: RandomGenerator;
+  private savedState!: number;
 
   constructor() {
-    this.seed = Math.abs(parseInt(window.location.hash.substring(1)))
+    this.setSeed(-1)
+  }
+
+  // we don't support negative seeds, so a seed of -1 indicates "use hash" instead
+  setSeed(nextSeed: number = -1) {
+    this.seed = Math.abs(nextSeed == -1 ? parseInt(window.location.hash.substring(1)) : nextSeed)
     if (isNaN(this.seed)) {
       this.seed = this.randomSeed()
     }
-    this.seed = this.seed
     this.generator = new RandomGenerator(this.seed)
     this.savedState = this.seed
   }
 
-  private randomSeed(): number {
-    return Math.floor(Math.random() * 1000)
+  setRandomSeed() {
+    this.setSeed(this.randomSeed())
   }
 
-  setRandomSeed() {
-    this.seed = this.randomSeed()
-    this.generator.setState(this.seed)
-    this.savedState = this.seed
+  private randomSeed(): number {
+    return Math.floor(Math.random() * 1000)
   }
 
   getSeed() {
