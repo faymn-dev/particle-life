@@ -1,6 +1,6 @@
 import type { Component } from "./component";
 import { Particle } from "./components/particle";
-import { CAMERA_PAN_SPEED, CAMERA_ZOOM_SPEED } from "./config";
+import { CAMERA_PAN_SPEED, CAMERA_ZOOM_SPEED, WALL_WIDTH, WALL_HEIGHT, WALL_THICKNESS } from "./config";
 import { Mouse } from "./mouse";
 import { constrain, initGrid, lerp } from "./utils";
 import { Vector } from "./vector";
@@ -10,6 +10,7 @@ export interface EngineArgs {
   container: HTMLElement;
   accelerateBy?: number;
 }
+
 
 export class Engine {
   container: HTMLElement
@@ -25,8 +26,9 @@ export class Engine {
 
   accelerateBy: number
 
-  zoom: number = 2
-  targetZoom: number = 1
+  initialZoom = 1
+  zoom = 1
+  targetZoom = 1
 
   camera = new Vector(0, 0)
   targetCamera = new Vector(0, 0)
@@ -49,7 +51,7 @@ export class Engine {
 
   private mount() {
     this.resize()
-
+    this.zoom = this.initialZoom
     addEventListener("resize", this.resize.bind(this))
 
     addEventListener("keydown", (e) => {
@@ -83,6 +85,11 @@ export class Engine {
     this.canvas.style.height = this.height + "px"
     this.canvas.width = this.width
     this.canvas.height = this.height
+
+    this.initialZoom = Math.max(
+      (innerWidth + WALL_THICKNESS) / (WALL_WIDTH * 2),
+      (innerHeight + WALL_THICKNESS) / (WALL_HEIGHT * 2)
+    )
   }
 
   append(component: Component) {
@@ -225,10 +232,7 @@ export class Engine {
     this.tags = {}
     this.grid = initGrid()
 
-    this.zoom = 0.5
-    this.targetZoom = 0.5
-
-    this.camera = new Vector(0, 0)
+    this.targetZoom = this.initialZoom
     this.targetCamera = new Vector(0, 0)
   }
 }

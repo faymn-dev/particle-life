@@ -12,14 +12,14 @@ export const NUM_PARTICLES = 18_000
 export const PARTICLE_RADIUS = 4
 export const NUM_PARTICLE_TYPE = 8
 
-export const WALL_WIDTH = 3000
+export const WALL_WIDTH = 3500
 export const WALL_HEIGHT = Math.ceil(WALL_WIDTH * 9 / 16) // refers to half of the height
 export const WALL_THICKNESS = 10
 
 export const CAMERA_PAN_SPEED = 10
 export const CAMERA_ZOOM_SPEED = 1.1
 
-const SCALE = 1.75
+const SCALE = 2
 
 export const CELL_SIZE = 64 * SCALE
 export const GRID_COLS = Math.ceil(WALL_WIDTH * 2 / CELL_SIZE)

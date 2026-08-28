@@ -137,7 +137,7 @@ export class Particle extends Component {
     this.vel.add(this.acc.mult(0.6))
     this.pos.add(this.vel.mult(0.6))
 
-    this.opacity = lerp(this.opacity, this.targetOpacity, 0.5 * this.engine.deltaTime)
+    this.opacity = lerp(this.opacity, this.targetOpacity, this.engine.deltaTime)
   }
 
   static createRandomArgs(): ParticleArgs {
