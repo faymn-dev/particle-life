@@ -14,6 +14,8 @@ interface ParticleArgs extends ComponentArgs {
 const DEFAULT_OPACITY = 0.1
 const HIGHLIGHT_OPACITY = 0.6
 
+const MAX_SPEED = 5
+
 export class Particle extends Component {
   pos: Vector
   vel: Vector
@@ -85,7 +87,7 @@ export class Particle extends Component {
 
     const neighbors = this.getNeighbors()
 
-    this.targetOpacity = neighbors.length > 100 || this.vel.mag() > 0.8 ? HIGHLIGHT_OPACITY : DEFAULT_OPACITY
+    this.targetOpacity = neighbors.length > 200 || this.vel.mag() > MAX_SPEED * 0.9 ? HIGHLIGHT_OPACITY : DEFAULT_OPACITY
     for (const particle of neighbors) {
       if (particle === this) {
         continue
@@ -121,13 +123,7 @@ export class Particle extends Component {
       }
     }
 
-    this.vel.add(this.acc)
-    this.vel.mult(0.85)
-
-    const maxSpeed = 5
-    if (this.vel.mag() > maxSpeed) {
-      this.vel.normalize().mult(maxSpeed)
-    }
+    this.vel.add(this.acc).mult(0.8).limit(MAX_SPEED)
 
     // add repulsion away from mouse on space
     if (this.engine.keys.has(" ")) {
