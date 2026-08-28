@@ -8,7 +8,6 @@ import { randomUtils } from "../random-utils"
 interface ParticleArgs extends ComponentArgs {
   pos: Vector
   vel?: Vector
-  radius: number;
   variant: number;
 }
 
@@ -19,7 +18,6 @@ export class Particle extends Component {
   pos: Vector
   vel: Vector
   acc = new Vector()
-  radius: number
   variant: number
 
   opacity = DEFAULT_OPACITY
@@ -32,7 +30,6 @@ export class Particle extends Component {
     })
     this.pos = args.pos
     this.vel = args.vel || new Vector()
-    this.radius = args.radius
     this.variant = args.variant
     if (this.variant < 0 || this.variant >= NUM_PARTICLE_TYPE) {
       throw new Error("invalid particle id")
@@ -124,18 +121,26 @@ export class Particle extends Component {
       }
     }
 
+    this.vel.add(this.acc)
+    this.vel.mult(0.85)
+
+    const maxSpeed = 5
+    if (this.vel.mag() > maxSpeed) {
+      this.vel.normalize().mult(maxSpeed)
+    }
+
     // add repulsion away from mouse on space
     if (this.engine.keys.has(" ")) {
       const mouse = this.engine.screenToWorld(this.engine.mouse)
       const direction = this.pos.clone().sub(mouse)
       const dist = direction.mag()
-      if (dist < 100) {
-        this.acc.add(direction.normalize().mult(100))
+      if (dist < 200) {
+        this.vel.mult(0).add(direction.normalize().mult(25))
       }
     }
 
-    this.vel.add(this.acc.mult(0.6))
-    this.pos.add(this.vel.mult(0.6))
+    this.pos.add(this.vel)
+    this.acc.mult(0) // reset acceleration for next frame
 
     this.opacity = lerp(this.opacity, this.targetOpacity, this.engine.deltaTime)
   }
@@ -148,7 +153,6 @@ export class Particle extends Component {
       ),
       vel: new Vector(0, 0),
       variant: randomUtils.int(0, NUM_PARTICLE_TYPE),
-      radius: PARTICLE_RADIUS
     }
   }
 
@@ -163,7 +167,7 @@ export class Particle extends Component {
     ctx.globalAlpha = this.opacity
     ctx.fillStyle = PARTICLE_COLORS[this.variant]
     ctx.beginPath()
-    ctx.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI)
+    ctx.arc(this.pos.x, this.pos.y, PARTICLE_RADIUS, 0, 2 * Math.PI)
     ctx.fill()
   }
 }

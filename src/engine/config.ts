@@ -9,7 +9,7 @@ import { randomUtils } from "./random-utils"
 // generally speaking, more particles, particle types, "scale" (anything that = more density) means better results
 
 export const NUM_PARTICLES = 18_000
-export const PARTICLE_RADIUS = 4
+export const PARTICLE_RADIUS = 5
 export const NUM_PARTICLE_TYPE = 8
 
 export const WALL_WIDTH = 3500
