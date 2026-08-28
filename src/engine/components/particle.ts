@@ -1,5 +1,5 @@
 import { Component, type ComponentArgs } from "../component"
-import { GRID_COLS, INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, PARTICLE_RADIUS, SPAWN_ZONE_SIZE, WALL_HEIGHT, WALL_WIDTH } from "../config"
+import { GRID_COLS, INTERACTIONS_MATRIX, MAX_DISTANCE_MATRIX, MIN_DISTANCE_MATRIX, NUM_PARTICLE_TYPE, PARTICLE_COLORS, PARTICLE_RADIUS, WALL_HEIGHT, WALL_THICKNESS, WALL_WIDTH } from "../config"
 import { isApproxEqual, lerp } from "../utils"
 import { Vector } from "../vector"
 import type { Wall } from "./wall"
@@ -12,6 +12,8 @@ interface ParticleArgs extends ComponentArgs {
   variant: number;
 }
 
+const DEFAULT_OPACITY = 0.1
+const HIGHLIGHT_OPACITY = 0.6
 
 export class Particle extends Component {
   pos: Vector
@@ -20,8 +22,8 @@ export class Particle extends Component {
   radius: number
   variant: number
 
-  opacity = 0;
-  targetOpacity = 0.3;
+  opacity = DEFAULT_OPACITY
+  targetOpacity = DEFAULT_OPACITY
 
   constructor(args: ParticleArgs) {
     super({
@@ -67,6 +69,7 @@ export class Particle extends Component {
   update() {
     this.acc.mult(0)
 
+
     const walls = this.engine.find<Wall>("wall")
     for (const wall of walls) {
       const direction = this.distanceTo(wall)
@@ -83,7 +86,10 @@ export class Particle extends Component {
       return
     }
 
-    for (const particle of this.getNeighbors()) {
+    const neighbors = this.getNeighbors()
+
+    this.targetOpacity = neighbors.length > 100 || this.vel.mag() > 0.8 ? HIGHLIGHT_OPACITY : DEFAULT_OPACITY
+    for (const particle of neighbors) {
       if (particle === this) {
         continue
       }
@@ -104,7 +110,7 @@ export class Particle extends Component {
       if (dist < min) {
         // apply repulsion the closer you get
         const force = (1 - min / dist)
-        if (Math.abs(force) >= 10) {
+        if (Math.abs(force) >= 10) { // spawn particle somewhere else because they were overlapping
           this.randomize()
           continue
         }
@@ -112,14 +118,13 @@ export class Particle extends Component {
       } else {
         const targetDist = (min + max) / 2;
         const variance = Math.pow((max - min) / 4, 2); // width of the bell
-
         const curve = Math.exp(-Math.pow(dist - targetDist, 2) / (2 * variance));
         const force = strength * curve;
         this.acc.add(direction.mult(force));
       }
     }
 
-    // add repulsion away from mouse on click
+    // add repulsion away from mouse on space
     if (this.engine.keys.has(" ")) {
       const mouse = this.engine.screenToWorld(this.engine.mouse)
       const direction = this.pos.clone().sub(mouse)
@@ -131,13 +136,17 @@ export class Particle extends Component {
 
     this.vel.add(this.acc.mult(0.6))
     this.pos.add(this.vel.mult(0.6))
-    this.vel.mult(0.5)
+
+    this.opacity = lerp(this.opacity, this.targetOpacity, 0.5 * this.engine.deltaTime)
   }
 
   static createRandomArgs(): ParticleArgs {
     return {
-      pos: randomUtils.vector(-SPAWN_ZONE_SIZE, SPAWN_ZONE_SIZE),
-      vel: randomUtils.vector(-1, 1),
+      pos: new Vector(
+        randomUtils.int(-WALL_WIDTH + WALL_THICKNESS, WALL_WIDTH - WALL_THICKNESS),
+        randomUtils.int(-WALL_HEIGHT + WALL_THICKNESS, WALL_HEIGHT - WALL_THICKNESS)
+      ),
+      vel: new Vector(0, 0),
       variant: randomUtils.int(0, NUM_PARTICLE_TYPE),
       radius: PARTICLE_RADIUS
     }
@@ -150,8 +159,6 @@ export class Particle extends Component {
 
   render() {
     const ctx = this.engine.ctx
-
-    this.opacity = lerp(this.opacity, this.targetOpacity, 0.1)
 
     ctx.globalAlpha = this.opacity
     ctx.fillStyle = PARTICLE_COLORS[this.variant]

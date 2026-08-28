@@ -1,5 +1,5 @@
 import type { Component } from "./component";
-import type { Particle } from "./components/particle";
+import { Particle } from "./components/particle";
 import { CAMERA_PAN_SPEED, CAMERA_ZOOM_SPEED } from "./config";
 import { Mouse } from "./mouse";
 import { constrain, initGrid, lerp } from "./utils";
@@ -25,8 +25,8 @@ export class Engine {
 
   accelerateBy: number
 
-  zoom: number = 0.5
-  targetZoom: number = 0.5
+  zoom: number = 2
+  targetZoom: number = 1
 
   camera = new Vector(0, 0)
   targetCamera = new Vector(0, 0)
@@ -35,6 +35,8 @@ export class Engine {
   keys: Set<string> = new Set()
 
   grid: Particle[][] = initGrid()
+
+  deltaTime = 0
 
   constructor(args: EngineArgs) {
     this.container = args.container
@@ -114,6 +116,10 @@ export class Engine {
   }
 
   start() {
+    let prevTime = performance.now()
+    let currTime = prevTime
+
+
     const animate = () => {
       requestAnimationFrame(animate)
 
@@ -146,8 +152,8 @@ export class Engine {
         this.targetCamera.add(new Vector(0, 1).mult(CAMERA_PAN_SPEED))
       }
 
-      this.camera.moveTowards(this.targetCamera, 0.2)
-      this.zoom = lerp(this.zoom, this.targetZoom, 0.2)
+      this.camera.moveTowards(this.targetCamera, 4 * this.deltaTime)
+      this.zoom = lerp(this.zoom, this.targetZoom, 4 * this.deltaTime)
 
       this.computeGrid()
 
@@ -166,7 +172,26 @@ export class Engine {
       ctx.scale(this.zoom, this.zoom)
       ctx.translate(-this.camera.x, -this.camera.y)
 
+      const bounds = {
+        left: ((-this.center.x) / this.zoom) + this.camera.x,
+        right: ((this.canvas.width - this.center.x) / this.zoom) + this.camera.x,
+        top: ((-this.center.y) / this.zoom) + this.camera.y,
+        bottom: ((this.canvas.height - this.center.y) / this.zoom) + this.camera.y
+      };
+
       for (const component of this.components) {
+        if (component instanceof Particle) {
+          const isVisible =
+            component.pos.x >= bounds.left &&
+            component.pos.x <= bounds.right &&
+            component.pos.y >= bounds.top &&
+            component.pos.y <= bounds.bottom
+
+          if (!isVisible) {
+            continue
+          }
+        }
+
         ctx.save()
         component.render()
         ctx.restore()
@@ -174,6 +199,11 @@ export class Engine {
       ctx.restore()
 
       this.mouse.update()
+
+      // delta time
+      currTime = performance.now()
+      this.deltaTime = (currTime - prevTime) / 1000
+      prevTime = currTime
     }
     requestAnimationFrame(animate)
   }
