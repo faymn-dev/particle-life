@@ -12,9 +12,8 @@ interface ParticleArgs extends ComponentArgs {
 }
 
 const DEFAULT_OPACITY = 0.1
-const HIGHLIGHT_OPACITY = 0.6
 
-const MAX_SPEED = 5
+let MAX_SPEED = 5
 
 export class Particle extends Component {
   pos: Vector
@@ -57,7 +56,11 @@ export class Particle extends Component {
       for (let y = -1; y <= 1; y++) {
         const neighborId = id + x + (y * GRID_COLS)
         if (neighborId >= 0 && neighborId < this.engine.grid.length) {
-          results.push(...this.engine.grid[neighborId])
+          for (const p of this.engine.grid[neighborId]) {
+            if (p !== this) {
+              results.push(p)
+            }
+          }
         }
       }
     }
@@ -85,9 +88,17 @@ export class Particle extends Component {
       return
     }
 
+    // highlight cell depending on number of neighbors and speed
+    // closely clustered cells get highlighted the brightest
     const neighbors = this.getNeighbors()
+    const closeNeighbors = neighbors.filter(n => n.pos.dist(this.pos) <= 24).length
+    this.targetOpacity = DEFAULT_OPACITY
+    if (closeNeighbors >= 7) {
+      this.targetOpacity = 0.75
+    } else if (neighbors.length >= 120 || this.vel.mag() >= MAX_SPEED / 2) {
+      this.targetOpacity = 0.25
+    }
 
-    this.targetOpacity = neighbors.length > 200 || this.vel.mag() > MAX_SPEED * 0.9 ? HIGHLIGHT_OPACITY : DEFAULT_OPACITY
     for (const particle of neighbors) {
       if (particle === this) {
         continue
@@ -106,24 +117,24 @@ export class Particle extends Component {
 
       direction.normalize()
 
+      const mid = (min + max) / 2;
+      let force = 0;
       if (dist < min) {
-        // apply repulsion the closer you get
-        const force = (1 - min / dist)
-        if (Math.abs(force) >= 10) { // spawn particle somewhere else because they were overlapping
-          this.randomize()
-          continue
-        }
-        this.acc.add(direction.mult(force));
+        // repulsion from 1 down to 0 as dist approaches min
+        force = (dist / min) - 1;
+      } else if (dist < mid) {
+        // ramp up from 0 to strength peak
+        force = strength * ((dist - min) / (mid - min));
       } else {
-        const targetDist = (min + max) / 2;
-        const variance = Math.pow((max - min) / 4, 2); // width of the bell
-        const curve = Math.exp(-Math.pow(dist - targetDist, 2) / (2 * variance));
-        const force = strength * curve;
-        this.acc.add(direction.mult(force));
+        // ramp down from strength peak to 0 at max
+        force = strength * (1 - (dist - mid) / (max - mid));
       }
+
+      this.acc.add(direction.mult(force));
     }
 
-    this.vel.add(this.acc).mult(0.8).limit(MAX_SPEED)
+
+    this.vel.add(this.acc.mult(0.8)).mult(0.8).limit(MAX_SPEED)
 
     // add repulsion away from mouse on space
     if (this.engine.keys.has(" ")) {

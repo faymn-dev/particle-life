@@ -1,6 +1,6 @@
 import type { Component } from "./component";
 import { Particle } from "./components/particle";
-import { CAMERA_PAN_SPEED, CAMERA_ZOOM_SPEED, WALL_WIDTH, WALL_HEIGHT, WALL_THICKNESS } from "./config";
+import { CAMERA_PAN_SPEED, CAMERA_ZOOM_SPEED, WALL_WIDTH, WALL_HEIGHT, WALL_THICKNESS, PARTICLE_RADIUS } from "./config";
 import { Mouse } from "./mouse";
 import { constrain, initGrid, lerp } from "./utils";
 import { Vector } from "./vector";
@@ -189,10 +189,10 @@ export class Engine {
       for (const component of this.components) {
         if (component instanceof Particle) {
           const isVisible =
-            component.pos.x >= bounds.left &&
-            component.pos.x <= bounds.right &&
-            component.pos.y >= bounds.top &&
-            component.pos.y <= bounds.bottom
+            component.pos.x >= bounds.left - PARTICLE_RADIUS &&
+            component.pos.x <= bounds.right + PARTICLE_RADIUS &&
+            component.pos.y >= bounds.top - PARTICLE_RADIUS &&
+            component.pos.y <= bounds.bottom + PARTICLE_RADIUS
 
           if (!isVisible) {
             continue

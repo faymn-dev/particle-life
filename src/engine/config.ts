@@ -8,11 +8,11 @@ import { randomUtils } from "./random-utils"
 //
 // generally speaking, more particles, particle types, "scale" (anything that = more density) means better results
 
-export const NUM_PARTICLES = 18_000
+export const NUM_PARTICLES = 11_000
 export const PARTICLE_RADIUS = 5
 export const NUM_PARTICLE_TYPE = 8
 
-export const WALL_WIDTH = 3500
+export const WALL_WIDTH = 3000
 export const WALL_HEIGHT = Math.ceil(WALL_WIDTH * 9 / 16) // refers to half of the height
 export const WALL_THICKNESS = 10
 
