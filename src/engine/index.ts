@@ -86,10 +86,11 @@ export class Engine {
     this.canvas.width = this.width
     this.canvas.height = this.height
 
-    this.initialZoom = Math.max(
+    // make the entire canvas visible
+    this.initialZoom = Math.min(
       (innerWidth + WALL_THICKNESS) / (WALL_WIDTH * 2),
       (innerHeight + WALL_THICKNESS) / (WALL_HEIGHT * 2)
-    )
+    ) * 0.9
   }
 
   append(component: Component) {

@@ -11,9 +11,9 @@ interface ParticleArgs extends ComponentArgs {
   variant: number;
 }
 
-const DEFAULT_OPACITY = 0.1
-const MAX_SPEED = 4
-const REPULSION_FORCE = 2
+const DEFAULT_OPACITY = 0.2
+const MAX_SPEED = 1
+const REPULSION_FORCE = 3
 
 export class Particle extends Component {
   pos: Vector
@@ -90,11 +90,12 @@ export class Particle extends Component {
 
     // highlight cell depending on number of neighbors and speed
     // closely clustered cells get highlighted the brightest
+    // lots of magic numbers here
     const neighbors = this.getNeighbors()
     const closeNeighbors = neighbors.filter(n => n.pos.dist(this.pos) <= 24).length
     this.targetOpacity = DEFAULT_OPACITY
-    if (closeNeighbors >= 20 || neighbors.length >= 120 || this.vel.mag() >= MAX_SPEED / 2) {
-      this.targetOpacity = 0.4
+    if (closeNeighbors >= 20 || neighbors.length >= 100 || this.vel.mag() >= MAX_SPEED / 2) {
+      this.targetOpacity = 0.7
     }
 
     for (const particle of neighbors) {
@@ -128,7 +129,8 @@ export class Particle extends Component {
       const direction = this.pos.clone().sub(mouse)
       const dist = direction.mag()
       if (dist < 200) {
-        this.vel.mult(0).add(direction.normalize().mult(25))
+        this.vel.mult(0)
+        this.pos.add(direction.normalize().mult(25))
       }
     }
 
