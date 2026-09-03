@@ -8,22 +8,23 @@ import { randomUtils } from "./random-utils"
 //
 // generally speaking, more particles, particle types, "scale" (anything that = more density) means better results
 
-export const NUM_PARTICLES = 11_000
+export const NUM_PARTICLES = 10_000
 export const PARTICLE_RADIUS = 5
 export const NUM_PARTICLE_TYPE = 8
 
-export const WALL_WIDTH = 3000
+export const WALL_WIDTH = 2000
 export const WALL_HEIGHT = Math.ceil(WALL_WIDTH * 9 / 16) // refers to half of the height
-export const WALL_THICKNESS = 10
+
+export const WALL_THICKNESS = 5
 
 export const CAMERA_PAN_SPEED = 10
 export const CAMERA_ZOOM_SPEED = 1.1
 
-const SCALE = 2
+const SCALE = 1.5
 
 export const CELL_SIZE = 64 * SCALE
-export const GRID_COLS = Math.ceil(WALL_WIDTH * 2 / CELL_SIZE)
-export const GRID_ROWS = Math.ceil(WALL_HEIGHT * 2 / CELL_SIZE)
+export const GRID_COLS = Math.ceil((WALL_WIDTH * 2) / CELL_SIZE)
+export const GRID_ROWS = Math.ceil((WALL_HEIGHT * 2) / CELL_SIZE)
 
 // randomize these dynamically  
 export let PARTICLE_COLORS: string[]
