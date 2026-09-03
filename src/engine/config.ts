@@ -20,7 +20,7 @@ export const WALL_THICKNESS = 5
 export const CAMERA_PAN_SPEED = 10
 export const CAMERA_ZOOM_SPEED = 1.1
 
-const SCALE = 1.5
+const SCALE = 1
 
 export const CELL_SIZE = 64 * SCALE
 export const GRID_COLS = Math.ceil((WALL_WIDTH * 2) / CELL_SIZE)
